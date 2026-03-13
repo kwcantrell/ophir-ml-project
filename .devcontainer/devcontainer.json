@@ -1,0 +1,19 @@
+{
+  "name": "My AI Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  // Features removed: All installations moved to Dockerfile for:
+  // - Consistency (no feature dependency issues)
+  // - Security (Claude Code for vscode user only, not root)
+  // - Simplicity (single source of truth)
+  // - Manual Control (user decides when to start Ollama)
+
+  "forwardPorts": [11434],
+  "mounts": [
+    "source=${localWorkspaceFolder}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ollama,target=/home/vscode/.ollama,type=bind,consistency=cached"
+  ],
+  "runArgs": ["--gpus=all"]
+}

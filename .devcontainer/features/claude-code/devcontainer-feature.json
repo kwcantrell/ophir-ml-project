@@ -1,0 +1,13 @@
+{
+  "id": "claude-code",
+  "version": "1.0.0",
+  "name": "Claude Code",
+  "description": "Installs Claude Code CLI",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of @anthropic-ai/claude-code to install"
+    }
+  }
+}

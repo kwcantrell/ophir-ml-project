@@ -1,0 +1,13 @@
+{
+  "id": "ollama",
+  "version": "1.0.0",
+  "name": "Ollama",
+  "description": "Installs Ollama for running local LLMs",
+  "options": {
+    "model": {
+      "type": "string",
+      "default": "",
+      "description": "Optional model to pull after install (e.g. llama3, mistral)"
+    }
+  }
+}

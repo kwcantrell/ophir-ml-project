@@ -20,4 +20,5 @@ Training logic should be in separate modules.
 
 from models.resnet import ResNet18
 
+
 __all__ = ["ResNet18"]

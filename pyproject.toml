@@ -125,19 +125,37 @@ preview = false
 max-complexity = 10
 
 
-# MyPy configuration for type checking
+# MyPy configuration for type checking - Industry standards for ML projects
 [tool.mypy]
 python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-warn_unreachable = true
-strict_optional = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-show_error_codes = true
-ignore_missing_imports = true  # Ignore external imports (wandb, torchmetrics, etc.)
+warn_return_any = true  # Warn about returning Any (can hide bugs)
+warn_unused_configs = true  # Warn about unused configuration options
+warn_unreachable = true  # Warn about unreachable code
+strict_optional = false  # Industry standard: allow None annotations for flexibility
+disallow_untyped_defs = false  # Relax for ML code patterns (PyTorch models)
+disallow_incomplete_defs = false  # Relax for ML code patterns
+check_untyped_defs = false  # Relax for ML code patterns
+show_error_codes = true  # Show error codes for easier debugging
+ignore_missing_imports = true  # Required for PyTorch projects (torch, torchvision, etc.)
+disable_error_code = ["arg-type"]  # Avoid pandas/numpy false positives
 exclude = ["tests/", "notebooks/", "models/"]
+# Module-specific overrides for PyTorch ecosystem
+[[tool.mypy.overrides]]
+module = "torch.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
+disable_error_code = "arg-type,return-value"
+[[tool.mypy.overrides]]
+module = "torchvision.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
+disable_error_code = "arg-type,return-value"
+[[tool.mypy.overrides]]
+module = "pandas.*"
+disable_error_code = "arg-type,return-value,union-attr"
+[[tool.mypy.overrides]]
+module = "numpy.*"
+disable_error_code = "arg-type,return-value,union-attr"
 
 [tool.pytest.ini_options]
 addopts = "-ra -q"

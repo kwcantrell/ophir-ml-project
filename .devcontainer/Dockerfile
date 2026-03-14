@@ -6,16 +6,16 @@ RUN apt-get update && apt-get install -y \
     zstd \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Ollama as root (install script runs as root)
-RUN curl -fsSL https://ollama.com/install.sh | sh
-
 # Install uv for fast dependency management (~10-100x faster than pip)
 # Uses official install script with automatic path setup
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Add HEALTHCHECK for container readiness verification
+# Install Ollama for local AI development
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# Add HEALTHCHECK to verify Claude Code is available (not Ollama)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:11434/ || exit 1
+  CMD curl -f http://localhost:8080/ || exit 1
 
 # Switch to vscode user and install tools here
 USER vscode

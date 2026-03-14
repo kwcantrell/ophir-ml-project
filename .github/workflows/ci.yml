@@ -27,9 +27,15 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Lock and Sync dependencies
+      - name: Sync dependencies (with locking for reproducibility)
         run: |
-          uv sync --frozen
+          # Use --frozen if lockfile exists, otherwise sync with auto-locking
+          if [ -f uv.lock ]; then
+            uv sync --frozen
+          else
+            echo "No uv.lock found - running sync without --frozen"
+            uv sync
+          fi
 
       - name: Check lockfile consistency
         run: |

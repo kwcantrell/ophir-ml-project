@@ -1,13 +1,44 @@
-# AI Setup Dev Container
+# PyTorch ML Project
 
-This is a pre-configured development environment that gives AI agents safe access to tools like file reading, web fetching, and bash commands.
+A production-ready PyTorch machine learning project template following industry best practices.
+
+**Features:**
+- Reproducible training with full seed control (Python, NumPy, PyTorch, CuDNN)
+- Optimized DataLoader patterns with producer-consumer design
+- Mixed precision (AMP) training support
+- W&B experiment tracking integration
+- TorchMetrics-based evaluation utilities
+- Early stopping and checkpoint management
+
+[View on GitHub](https://github.com/kwcantrell/ophir-ml-project) | [Documentation](docs/modules.md)
+
+---
+
+## 📦 Project Overview
+
+This repository provides a production-ready template for PyTorch machine learning projects:
+
+**What's included:**
+- **configs/** - YAML configuration files for training, evaluation, and inference
+- **models/** - Pre-built model architectures (ResNet18)
+- **src/train/** - Training loop implementations and utilities
+- **src/eval/** - Evaluation pipeline logic
+- **src/utils/** - Shared utilities (seeds, data loading, metrics, tracking, training helpers)
+- **scripts/** - Shell scripts for common workflows
+- **notebooks/** - Jupyter notebook templates
+- **tests/** - Unit and integration test suites
+
+**Use this template to:**
+- Start new ML projects with best practices built-in
+- Standardize your team's ML development workflow
+- Share reproducible training pipelines with colleagues
 
 ---
 
 ## 🛠️ Tools Available
 
 | Tool | Purpose |
-|------|---------|
+|------|--------|
 | **[Docker](#dev-container-setup)** | Creates isolated containers for safe agent execution |
 | **[Dev Containers](#dev-containers)** | VS Code integration - IDE runs inside container |
 | **[Ollama](#ollama-configuration)** | Runs local LLM models (port 11434) |

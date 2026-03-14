@@ -22,4 +22,5 @@ USER vscode
 
 # Install Claude Code and uv for vscode user only
 RUN curl -fsSL https://claude.ai/install.sh | bash && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh && \
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"

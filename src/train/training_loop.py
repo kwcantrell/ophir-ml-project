@@ -9,20 +9,20 @@ This module provides a production-ready training loop with:
 - Progress logging
 """
 
+from collections.abc import Callable
+
 import torch
-from typing import Callable, Optional
-import time
 
 
 def train_epoch(
-    model,
-    dataloader,
+    model: torch.nn.Module,
+    dataloader: torch.utils.data.DataLoader,
     criterion: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
     device: str = "cuda",
-    scaler: torch.cuda.amp.GradScaler = None,
-    lr_scheduler: Optional[Callable] = None,
-    epoch_progress_callback: Callable[[int, float], None] = None
+    scaler: torch.cuda.amp.GradScaler | None = None,
+    lr_scheduler: Callable | None = None,  # Unused, kept for API compatibility
+    epoch_progress_callback: Callable[[int, float, float], None] | None = None,
 ) -> tuple[float, float]:
     """
     Train for one epoch.
@@ -49,8 +49,8 @@ def train_epoch(
         data, target = data.to(device), target.to(device)
 
         # Forward pass
-        if scaler:
-            with torch.cuda.amp.autocast():
+        if scaler is not None:
+            with torch.amp.autocast("cuda"):
                 output = model(data)
                 loss = criterion(output, target)
         else:
@@ -59,7 +59,7 @@ def train_epoch(
 
         # Backward pass and optimization
         optimizer.zero_grad()
-        if scaler:
+        if scaler is not None:
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -73,7 +73,7 @@ def train_epoch(
         # Track progress
         total_loss += loss.item()
 
-        if epoch_progress_callback:
+        if epoch_progress_callback is not None:
             epoch_progress_callback(batch_idx + 1, num_batches, loss.item())
 
     avg_loss = total_loss / num_batches
@@ -82,7 +82,12 @@ def train_epoch(
 
 
 @torch.no_grad()
-def validate(model, dataloader, criterion: torch.nn.Module, device: str = "cuda") -> tuple[float, float]:
+def validate(
+    model: torch.nn.Module,
+    dataloader: torch.utils.data.DataLoader,
+    criterion: torch.nn.Module,
+    device: str = "cuda",
+) -> tuple[float, float]:
     """
     Validate model on evaluation set.
 
@@ -98,12 +103,13 @@ def validate(model, dataloader, criterion: torch.nn.Module, device: str = "cuda"
     model.eval()
     total_loss = 0.0
     correct = 0
-    num_samples = len(dataloader.dataset)
+    num_samples = 0
 
     for data, target in dataloader:
         data, target = data.to(device), target.to(device)
+        num_samples += data.size(0)
 
-        with torch.cuda.amp.autocast() if device == "cuda" else torch.no_grad():
+        with torch.amp.autocast("cuda") if device == "cuda" else torch.no_grad():
             output = model(data)
             loss = criterion(output, target)
 

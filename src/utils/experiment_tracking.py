@@ -5,12 +5,38 @@ Provides automatic logging for metrics, images, hyperparameters, and checkpoints
 """
 
 import os
-from typing import Optional
+from typing import Any
+
 
 try:
     import wandb
+
+    _wandb_available = True
 except ImportError:
-    wandb = None
+    # When wandb is not installed, use a mock object
+    class _WandbMock:
+        """Mock wandb object when not installed."""
+
+        def __getattr__(self, name: str) -> Any:
+            raise ImportError("wandb is not installed. Run `pip install wandb`.")
+
+        def __call__(self, *args: Any, **kwargs: Any) -> Any:
+            raise ImportError("wandb is not installed. Run `pip install wandb`.")
+
+        @property
+        def init(self) -> Any:
+            raise ImportError("wandb is not installed. Run `pip install wandb`.")
+
+        @property
+        def Table(self) -> Any:
+            raise ImportError("wandb is not installed. Run `pip install wandb`.")
+
+        @property
+        def Artifact(self) -> Any:
+            raise ImportError("wandb is not installed. Run `pip install wandb`.")
+
+    wandb = _WandbMock()  # type: ignore[assignment]
+    _wandb_available = False
 
 
 class WandBLogger:
@@ -19,10 +45,10 @@ class WandBLogger:
     def __init__(
         self,
         project_name: str,
-        entity: str = None,
-        name: str = None,
-        notes: str = None,
-        **kwargs
+        entity: str | None = None,
+        name: str | None = None,
+        notes: str | None = None,
+        **kwargs: Any,
     ):
         """
         Args:
@@ -36,16 +62,16 @@ class WandBLogger:
         self.entity = entity
         self.name = name
         self.notes = notes
-        self.wandb_run = None
+        self.wandb_run: Any = None
 
         # Initialize W&B if credentials are available
-        if wandb is not None:
+        if _wandb_available:
             try:
                 self._init_wandb(**kwargs)
             except Exception as e:
                 print(f"WandB logging disabled: {e}")
 
-    def _init_wandb(self, **kwargs) -> "WandBLogger":
+    def _init_wandb(self, **kwargs: Any) -> "WandBLogger":  # noqa: ARG002
         """Initialize W&B run."""
         # Skip if running in CI or no API key found
         env_vars = ["WANDB_DISABLED", "WANDB_MODE"]
@@ -58,11 +84,11 @@ class WandBLogger:
             name=self.name,
             notes=self.notes,
             config=kwargs.pop("config", {}),
-            **kwargs
+            **kwargs,
         )
         return self
 
-    def log_metrics(self, metrics: dict, step: int = None) -> "WandBLogger":
+    def log_metrics(self, metrics: dict[str, Any], step: int | None = None) -> "WandBLogger":
         """
         Log metrics to W&B.
 
@@ -73,11 +99,11 @@ class WandBLogger:
         Returns:
             Self for method chaining
         """
-        if self.wandb_run is not None:
+        if self.wandb_run is not None and _wandb_available:
             self.wandb_run.log(metrics, step=step)
         return self
 
-    def log_image(self, name: str, image: dict, step: int = None) -> "WandBLogger":
+    def log_image(self, name: str, image: dict[str, Any], step: int | None = None) -> "WandBLogger":
         """
         Log an image to W&B.
 
@@ -89,17 +115,25 @@ class WandBLogger:
         Returns:
             Self for method chaining
         """
-        if self.wandb_run is not None:
+        if self.wandb_run is not None and _wandb_available:
             self.wandb_run.log({name: image}, step=step)
         return self
 
-    def log_table(self, name: str, dataframe=None, data=None):
+    def log_table(
+        self,
+        name: str,
+        dataframe: Any = None,
+        data: Any = None,
+    ) -> "WandBLogger":
         """Log a table to W&B."""
-        if self.wandb_run is not None and wandb is not None:
-            self.wandb_run.log({name: wandb.Table(dataframe=dataframe, data=data)})
+        if self.wandb_run is not None and _wandb_available:
+            self.wandb_run.log(
+                {name: wandb.Table(dataframe=dataframe, data=data)},
+                step=None,
+            )
         return self
 
-    def save_artifact(self, artifact_path: str, name: str = None) -> "WandBLogger":
+    def save_artifact(self, artifact_path: str, name: str | None = None) -> "WandBLogger":
         """
         Save a file/artifact to W&B.
 
@@ -110,19 +144,20 @@ class WandBLogger:
         Returns:
             Self for method chaining
         """
-        if self.wandb_run is not None and wandb is not None:
-            artifact = wandb.Artifact(name or os.path.basename(artifact_path))
+        if self.wandb_run is not None and _wandb_available:
+            artifact_name = name if name else os.path.basename(artifact_path)
+            artifact = wandb.Artifact(artifact_name, type="artifact")
             artifact.add_file(artifact_path)
             self.wandb_run.log_artifact(artifact)
         return self
 
-    def finish(self):
+    def finish(self) -> None:
         """Finish the current run."""
-        if self.wandb_run is not None:
+        if self.wandb_run is not None and _wandb_available:
             self.wandb_run.finish()
 
 
-def setup_experiment_tracking(config, **kwargs) -> Optional[WandBLogger]:
+def setup_experiment_tracking(config: dict[str, Any], **kwargs: Any) -> WandBLogger | None:
     """
     Set up experiment tracking based on configuration.
 
@@ -137,12 +172,7 @@ def setup_experiment_tracking(config, **kwargs) -> Optional[WandBLogger]:
     if not tracking.get("enabled", False):
         return None
 
-    platform = tracking.get("platform", "wandb")
     project_name = tracking.get("project_name", "pytorch-experiments")
     entity = tracking.get("entity", os.environ.get("WANDB_ENTITY"))
 
-    return WandBLogger(
-        project_name=project_name,
-        entity=entity,
-        **kwargs
-    )
+    return WandBLogger(project_name=project_name, entity=entity, **kwargs)

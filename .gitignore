@@ -86,6 +86,7 @@ __pypackages__/
 celerybeat-schedule.celerybeat-scheduler 4.
 *.pid
 *.lock
+!uv.lock
 celerybeat.pid
 
 # SageMath parsed files

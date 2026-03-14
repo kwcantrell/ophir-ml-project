@@ -1,23 +1,136 @@
-# AI Setup Dev Container
+# PyTorch ML Project
 
-This is a pre-configured development environment that gives AI agents safe access to tools like file reading, web fetching, and bash commands.
+A production-ready PyTorch machine learning project template following industry best practices.
+
+**Features:**
+- Reproducible training with full seed control (Python, NumPy, PyTorch, CuDNN)
+- Optimized DataLoader patterns with producer-consumer design
+- Mixed precision (AMP) training support
+- W&B experiment tracking integration
+- TorchMetrics-based evaluation utilities
+- Early stopping and checkpoint management
+- Comprehensive linting and formatting with Ruff/MyPy
+- Pre-commit hooks for code quality enforcement
+
+[View on GitHub](https://github.com/kwcantrell/ophir-ml-project) | [Documentation](docs/modules.md) | [Best Practices](docs/best-practices-guide.md)
 
 ---
 
-## 🛠️ Tools Available
+## 📦 Project Overview
 
-| Tool | Purpose |
-|------|---------|
-| **[Docker](#dev-container-setup)** | Creates isolated containers for safe agent execution |
-| **[Dev Containers](#dev-containers)** | VS Code integration - IDE runs inside container |
-| **[Ollama](#ollama-configuration)** | Runs local LLM models (port 11434) |
-| **[Claude Code](https://claude.ai/)** | AI assistant CLI for terminal assistance |
+This repository provides a production-ready template for PyTorch machine learning projects:
 
-All tools are installed automatically when the container builds. When you're done, just stop the container to reset everything cleanly.
+**What's included:**
+- **configs/** - YAML configuration files for training, evaluation, and inference
+- **models/** - Pre-built model architectures (ResNet18)
+- **src/train/** - Training loop implementations and utilities
+- **src/eval/** - Evaluation pipeline logic
+- **src/utils/** - Shared utilities (seeds, data loading, metrics, tracking, training helpers)
+- **scripts/** - Shell scripts for common workflows
+- **notebooks/** - Jupyter notebook templates
+- **tests/** - Unit and integration test suites
+
+**Use this template to:**
+- Start new ML projects with best practices built-in
+- Standardize your team's ML development workflow
+- Share reproducible training pipelines with colleagues
 
 ---
 
-## 🔒 Security Overview
+## 🚀 Quick Start
+
+### Prerequisites
+- Docker Desktop (for containerized environment)
+- VS Code (recommended for Dev Containers)
+
+### Step-by-Step Setup
+
+1. **Clone and open in VS Code**
+   ```bash
+   git clone https://github.com/kwcantrell/ophir-ml-project.git
+   cd ophir-ml-project
+   code .
+   ```
+
+2. **Wait for Dev Container to build** (first run may take a few minutes)
+
+3. **Start training!**
+   ```bash
+   # Train with default configuration
+   uv run python -m src.train.main --config configs/train.yaml
+
+   # Or use a custom config
+   uv run python -m src.train.main --config configs/train-custom.yaml
+   ```
+
+### Quick Reference Commands
+
+```bash
+# Install dependencies
+uv sync
+
+# Run training
+uv run python -m src.train.main --config configs/train.yaml
+
+# Run evaluation
+uv run python -m src.eval.run --config configs/eval.yaml
+
+# View experiment logs (WandB)
+wandb offlinelogs
+
+# Run tests
+uv run pytest tests/ -v --cov=src
+
+# Format code with Ruff
+pre-commit run --all-files
+
+# Check types
+uv run mypy src/ models/
+```
+
+---
+
+## 🛠️ Tool Stack Overview
+
+| Category | Recommendation | Description |
+|----------|---------------|-------------|
+| **Package Manager** | UV | Fast, PEP 621 compliant package management |
+| **Linter** | Ruff | Fast Python linter with formatting support |
+| **Type Checker** | MyPy | Static type checking for Python |
+| **Test Runner** | pytest | Comprehensive test framework with coverage |
+| **Tracking** | W&B | Experiment tracking and visualization |
+| **Pre-commit** | pre-commit-hooks | Automated code quality checks |
+
+### Development Workflow
+
+1. **Install dependencies** with `uv sync` (uses uv.lock)
+2. **Run pre-commit hooks** before commits: `pre-commit run --all-files`
+3. **Type check** with MyPy for production code
+4. **Run tests** with pytest coverage reporting
+
+### uv Commands Reference
+
+```bash
+# Sync dependencies (creates uv.lock)
+uv sync
+
+# Run a script without activating venv
+uv run <command>
+
+# Add/upgrade packages
+uv add <package>
+uv upgrade <package>
+
+# Add dev dependency
+uv add --dev pytest ruff mypy
+
+# Freeze current environment to lock file
+uv lock
+```
+
+---
+
+## 🔒 Security & Best Practices
 
 ### Container Isolation
 The agent runs in a Docker container separate from your host system. By default, it cannot access files outside the workspace or mounted directories.
@@ -54,41 +167,24 @@ Dev Containers extend Docker by integrating directly with VS Code. When you open
 
 See [devcontainer.json](/.devcontainer/devcontainer.json) for mount configuration.
 
-### Ollama Configuration
-Ollama is a lightweight runtime for local LLM models on port 11434.
+### Project Structure
 
-**Why local matters:**
-- **Privacy** - Models never leave your machine
-- **Offline capability** - Work continues without internet
-- **Performance** - No network latency to external APIs
-
-To use Ollama, run `ollama serve` in the VS Code terminal first (or leave it running). Then pull models with:
-
-```bash
-ollama pull llama3.2
 ```
-
----
-
-## 🚀 Getting Started
-
-1. **Install Docker Desktop** (if not already installed)
-   - Download from https://www.docker.com/products/docker-desktop/
-
-2. **Open this folder in VS Code**
-   - The Dev Container will automatically build and install tools
-   - First run takes a few minutes; subsequent runs use cached image
-
-3. **(Optional) Pull Ollama models**
-   ```bash
-   ollama pull llama3.2
-   ```
-   Only needed once. Run `ollama serve` in terminal to keep it running.
-
-4. **Start using!**
-   - Use the `claude` command or `/claude` slash command for AI assistance
-
-That's it! Your environment is now ready for AI-powered development.
+ophir-ml-project/
+├── configs/              # YAML configs (train, eval, inference)
+├── models/               # Pre-built model architectures
+├── src/                  # Source code
+│   ├── train/           # Training loop and utilities
+│   ├── eval/            # Evaluation pipeline
+│   └── utils/           # Shared utilities
+├── tests/                # Unit and integration tests
+├── notebooks/            # Jupyter notebooks
+├── scripts/              # Shell scripts for workflows
+├── docs/                 # Documentation (modules, best practices)
+├── pyproject.toml       # Project configuration with dependencies
+├── .pre-commit-config.yaml  # Pre-commit hooks
+└── README.md            # This file
+```
 
 ---
 
@@ -122,6 +218,10 @@ See [/.devcontainer/devcontainer.json](/.devcontainer/devcontainer.json) for:
 - Normal on first run while Docker pulls the image from registry
 - Subsequent builds are cached and fast
 
+### Pre-commit Hooks Not Running
+- Install hooks: `pre-commit install`
+- Or run manually: `pre-commit run --all-files`
+
 ---
 
 ## ✅ Summary
@@ -136,27 +236,6 @@ Use it to:
 - Develop AI applications with consistent tooling
 - Test local LLM-based workflows without external APIs
 - Share your environment with colleagues via git
-
----
-
-## 🔗 External Resources
-
-- [Docker Docs](https://docs.docker.com/get-started/) - Learn about containerization
-- [Dev Containers Docs](https://containers.dev/) - Standard for containerized development environments
-- [Ollama Docs](https://ollama.ai/docs) - Run local LLM models
-- [Claude Code Docs](https://claude.ai/) - AI assistant CLI features
-
----
-
-## 🔐 Security Notes
-
-This environment prioritizes your security through:
-- **Container isolation** - Agents run in sandboxed environment
-- **Limited user privileges** - Claude Code installed as vscode user, not root
-- **Selective mounts** - Only necessary directories exposed
-- **Bind mount constraints** - Agents confined to workspace + selected paths
-
-For detailed security rationale and threat mitigations, see [.devcontainer/best-practices.md](.devcontainer/best-practices.md).
 
 ---
 
@@ -177,7 +256,7 @@ The best practices guide covers:
 ### Recommended Tool Stack
 
 | Category | Recommendation | Alternative |
-|----------|---------------|-----|--|
+|----------|---------------|-------------|
 | **Config** | OmegaConf + YAML | Dict/JSON configs |
 | **Tracking** | W&B (primary) | MLflow, TensorBoard |
 | **Metrics** | TorchMetrics | sklearn.metrics |
@@ -188,19 +267,26 @@ The best practices guide covers:
 ```python
 # 1. Reproducibility setup
 from src.utils import set_seeds
+
 set_seeds(seed=42)
 
 # 2. Optimized DataLoader configuration
 from torch.utils.data import DataLoader
+from src.utils.data_loading import create_dataloader
+
 train_loader = create_dataloader(
     train_dataset,
-    batch_size=32, shuffle=True,
-    num_workers=4, pin_memory=True, prefetch_factor=2,
-    persistent_workers=True
+    batch_size=32,
+    shuffle=True,
+    num_workers=4,
+    pin_memory=True,
+    prefetch_factor=2,
+    persistent_workers=True,
 )
 
 # 3. Training loop with AMP and early stopping
 from src.utils import EarlyStopping, setup_mixed_precision
+
 scaler = setup_mixed_precision()
 early_stopping = EarlyStopping(patience=5, min_delta=0.01)
 
@@ -215,7 +301,7 @@ for epoch in range(epochs):
     lr_scheduler.step()
 ```
 
-### Resources
+### Additional Resources
 
 - [PyTorch Best Practices Guide](https://pytorch.org/tutorials/beginner/basics/notes.html)
 - [PyTorch Lightning](https://pytorch-lightning.readthedocs.io/)
@@ -230,7 +316,7 @@ This project uses **uv** for fast, reliable Python package management.
 
 ### What is uv?
 
-[uv](https://github.com/astral-sh/uv) is an extremely fast Python package manager and interpreter written in Rust. It's up to 10x faster than pip/virtualenv.
+[uv](https://github.com/astral-sh/uv) is an extremely fast Python package manager and interpreter written in Rust (10x+ faster than pip). It supports PEP 621 `pyproject.toml` workflows natively.
 
 ### Quick Start with UV
 
@@ -238,56 +324,81 @@ This project uses **uv** for fast, reliable Python package management.
 # Install uv if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Create virtual environment
-uv venv .venv
+# Navigate to project directory
+cd /path/to/project
 
-# Activate the environment
-source .venv/bin/activate  # On Linux/Mac
+# Create virtual environment and sync dependencies
+uv venv .venv && source .venv/bin/activate  # Linux/Mac
 # or
-.venv\Scripts\activate.bat  # On Windows
+uv venv .venv && .venv\Scripts\activate.bat   # Windows
 
-# Install dependencies from requirements.txt
-uv pip install -r requirements.txt
-
-# Or add packages interactively
-uv pip install torch torchvision torchaudio
-```
-
-### uv Commands Cheat Sheet
-
-```bash
-# Create new project with template
-uv init <project-name> --python 3.10
-
-# Sync project (installs dependencies)
+# Sync all dependencies from pyproject.toml
 uv sync
 
-# Run Python script with uv
-uv run python my_script.py
-
-# Add dev dependencies
-uv add torch torchvision
-
-# Run without activating venv
-uv run pytest tests/
-
-# Show dependency tree
-uv pip tree --graph | dot -Tpng > deps.png
-
-# Check for updates
-uv self update
+# Run any command with uv (auto-resolves dependencies)
+uv run python -c "print('Hello!')"
 ```
 
-### Requirements File
+### Modern `pyproject.toml` Workflow
 
-The `requirements.txt` file in the project root contains production dependencies. Use it with:
+This project uses PEP 621-style configuration:
 
+**Install production dependencies:**
 ```bash
-# Install from requirements
-uv pip install -r requirements.txt
-
-# Or use uv pip directly
-uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+uv sync --frozen  # Uses uv.lock for reproducible builds
 ```
+
+**Add a new package:**
+```bash
+uv add numpy pandas
+```
+
+**Add dev dependency:**
+```bash
+uv add --dev pytest ruff mypy
+```
+
+**Run tests without activating venv:**
+```bash
+uv run pytest tests/ -v --cov=src
+```
+
+### pyproject.toml Structure
+
+The project uses modern PEP 621 syntax:
+
+```toml
+[project]
+name = "ophir-ml-project"
+dependencies = ["torch>=2.0", ...]
+requires-python = ">=3.9"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4",
+    "mypy>=1.8",
+    "ruff>=0.4.5",
+]
+```
+
+This allows `uv sync` to resolve all dependencies automatically.
+
+### Notes on Requirements.txt
+
+For backwards compatibility, a `requirements.txt` file is provided. However:
+- Use `uv sync` for development (resolves from pyproject.toml)
+- Use `uv pip install -r requirements.txt` only when necessary
+- The `pyproject.toml` + `uv.lock` combination provides better reproducibility
 
 ---
+
+## 🔗 External Resources
+
+- [Docker Docs](https://docs.docker.com/get-started/) - Learn about containerization
+- [Dev Containers Docs](https://containers.dev/) - Standard for containerized development environments
+- [Ollama Docs](https://ollama.ai/docs) - Run local LLM models
+- [Claude Code Docs](https://claude.ai/) - AI assistant CLI features
+
+---
+
+[Security guidance](/.devcontainer/best-practices.md#security) for this environment is documented in the Dev Container best practices guide.

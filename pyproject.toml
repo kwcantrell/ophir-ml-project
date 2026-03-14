@@ -2,7 +2,7 @@
 name = "ophir-ml-project"
 version = "0.1.0"
 description = "Machine learning project using PyTorch best practices"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "torch>=2.0",
     "torchvision>=0.15",
@@ -10,14 +10,26 @@ dependencies = [
     "pandas>=2.0",
     "omegaconf>=2.3",
     "tqdm>=4.66",
+    "wandb>=0.25.1",
+]
+
+[dependency-groups]
+dev = [
+    # Development dependencies for uv sync
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.6",
+    "mypy>=1.8",
+    "pre-commit>=4.5.1",
 ]
 
 [project.optional-dependencies]
+# Optional dependencies for extended functionality
 dev = [
+    # Development and testing tools
     "pytest>=7.4",
     "pytest-cov>=4.1",
-    "black>=24.0",
-    "ruff>=0.1",
+    "ruff>=0.6",  # linting, formatting, and auto-fix
     "mypy>=1.8",
 ]
 
@@ -28,11 +40,147 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src", "models"]
 
+# Ruff configuration - line length, target Python version
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+# Target Python version matches requires-python >=3.10
+target-version = "py310"
 
+# Ruff linting rules configuration - Industry standard setup
+[tool.ruff.lint]
+# Minimal, focused rule selection per industry best practices:
+# - E/W: pycodestyle (only for issues Black doesn't handle)
+# - F: pyflakes (essential for undefined names)
+# - UP: pyupgrade (modernize Python syntax)
+# - I: isort (import sorting)
+# - C4: flake8-comprehensions (collection comprehensions)
+# - A: flake8-builtins (avoid shadowing builtins)
+# - ISC: flake8-implicit-str-concat (implicit string concatenation)
+# - ICN: flake8-import-conventions (import naming conventions)
+# - PGH: pygrep-hooks (regex-based git-ignore patterns)
+# - PT: flake8-pytest-style (pytest style)
+# - SIM: flake8-simplify (simplification rules)
+# - SLF: flake8-self (private member access)
+# - TID: flake8-tidy-imports (tidy import conventions)
+# - TRY: flake8-try (try/except style)
+# - B: flake8-bugbear (bug detection - essential)
+# - S: security (enabled where appropriate)
+# - NPY: NumPy rules (with selective ignores)
+select = [
+    "E", "F", "W",  # pycodestyle errors/warnings
+    "UP",  # pyupgrade
+    "I",  # isort
+    "C4",  # flake8-comprehensions
+    "A",  # flake8-builtins
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "PGH",  # pygrep-hooks
+    "PT",  # flake8-pytest-style
+    "SIM",  # flake8-simplify
+    "SLF",  # flake8-self
+    "TID",  # flake8-tidy-imports
+    "TRY",  # flake8-try
+    "B",  # flake8-bugbear (bug detection)
+    "S",  # security (with selective enables)
+    "NPY",  # NumPy rules
+    "PERF",  # performance (specific rules only)
+]
+ignore = [
+    # ANN: All ANN rules disabled - mypy handles type annotations
+    "ANN",
+    # NPY: Allow numpy imports at top level (ML project convention)
+    "NPY001",
+    # S: Security rules relaxed for ML training code with env vars
+    "S105",  # Possible hardcoded password
+    "S106",  # Possible hardcoded password in argument
+    "S107",  # Possible hardcoded password in variable name
+    # PERF: Edge cases
+    "PERF203",  # timeout=... creates potential infinite loop edge case
+    # TRY003: Long error messages are helpful for debugging (ML projects)
+    "TRY003",
+]
+
+# Per-file ignores - simplified per industry standards
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]  # Allow assert statements in tests
+"src/utils/seeds.py" = ["NPY002"]  # Legacy np.random.seed pattern
+"src/utils/experiment_tracking.py" = ["TRY003"]  # Intentional ImportError messages
+
+# isort configuration (compatible with Black formatting)
+[tool.ruff.lint.isort]
+known-first-party = ["ophir_ml_project", "src", "models"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+lines-after-imports = 2
+force-sort-within-sections = true
+
+# Ruff autofix configuration
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+skip-magic-trailing-comma = false
+preview = false
+
+# McCabe complexity configuration
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+
+# MyPy configuration for type checking - Industry standards for ML projects
 [tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
+python_version = "3.10"
+warn_return_any = true  # Warn about returning Any (can hide bugs)
+warn_unused_configs = true  # Warn about unused configuration options
+warn_unreachable = true  # Warn about unreachable code
+strict_optional = false  # Industry standard: allow None annotations for flexibility
+disallow_untyped_defs = false  # Relax for ML code patterns (PyTorch models)
+disallow_incomplete_defs = false  # Relax for ML code patterns
+check_untyped_defs = false  # Relax for ML code patterns
+show_error_codes = true  # Show error codes for easier debugging
+ignore_missing_imports = true  # Required for PyTorch projects (torch, torchvision, etc.)
+disable_error_code = ["arg-type"]  # Avoid pandas/numpy false positives
+exclude = ["tests/", "notebooks/", "models/"]
+# Module-specific overrides for PyTorch ecosystem
+[[tool.mypy.overrides]]
+module = "torch.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
+disable_error_code = "arg-type,return-value"
+[[tool.mypy.overrides]]
+module = "torchvision.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
+disable_error_code = "arg-type,return-value"
+[[tool.mypy.overrides]]
+module = "pandas.*"
+disable_error_code = "arg-type,return-value,union-attr"
+[[tool.mypy.overrides]]
+module = "numpy.*"
+disable_error_code = "arg-type,return-value,union-attr"
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*", "*Test"]
+python_functions = ["test_*"]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "no cov",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if sys.platform.",
+    "@overload",
+]

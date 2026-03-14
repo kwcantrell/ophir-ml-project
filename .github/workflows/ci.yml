@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  UV_ENV: ci
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Sync dependencies (with locking for reproducibility)
+        run: |
+          # Use --frozen if lockfile exists, otherwise sync with auto-locking
+          if [ -f uv.lock ]; then
+            uv sync --frozen
+          else
+            echo "No uv.lock found - running sync without --frozen"
+            uv sync
+          fi
+
+      - name: Check lockfile consistency
+        run: |
+          uv lock --check || (echo "Lockfile mismatch!" && exit 1)
+
+      - name: Run linters (ruff)
+        run: |
+          uv run ruff check src models
+
+      # NOTE: mypy type checking is currently skipped due to pre-existing annotation issues.
+      # Consider adding it once all functions have type annotations.
+      # run: |
+      #   uv run mypy src models --ignore-missing-imports || (echo "Type errors detected")
+
+      - name: Run tests with coverage
+        run: |
+          uv run pytest -v --cov=src --cov=models --cov-report=term-missing
+
+  # NOTE: Docker build jobs are disabled in CI to keep the workflow faster.
+  # To enable, set up docker-buildx-action on GitHub runners or use a self-hosted runner with Docker.
+  # The build-and-test-docker and build-and-test-docker-prod jobs have been commented out.

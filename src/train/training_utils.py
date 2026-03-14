@@ -2,7 +2,6 @@
 Common training utilities including learning rate scheduling and callbacks.
 """
 
-from typing import Callable, Optional
 import torch
 
 
@@ -17,7 +16,11 @@ class LearningRateScheduler:
         """Initialize with an existing PyTorch scheduler."""
         self.scheduler = scheduler
 
-    def step(self, epoch: int, current_step: Optional[int] = None) -> "LearningRateScheduler":
+    def step(
+        self,
+        epoch: int,
+        current_step: int | None = None,
+    ) -> "LearningRateScheduler":
         """
         Step the scheduler.
 
@@ -42,7 +45,7 @@ class LearningRateScheduler:
             "epoch": self.scheduler.last_epoch,
         }
 
-    def load_state_dict(self, state_dict: dict):
+    def load_state_dict(self, state_dict: dict) -> None:
         """Load state dictionary to restore scheduler."""
         self.scheduler.load_state_dict(state_dict["scheduler"])
 
@@ -50,7 +53,7 @@ class LearningRateScheduler:
 def get_lr_scheduler(
     optimizer: torch.optim.Optimizer,
     scheduler_type: str = "CosineAnnealingLR",
-    **kwargs
+    **kwargs: object,
 ) -> LearningRateScheduler:
     """
     Create a learning rate scheduler.
@@ -74,4 +77,8 @@ def get_lr_scheduler(
     }
 
     scheduler_class = schedulers.get(scheduler_type, torch.optim.lr_scheduler.CosineAnnealingLR)
-    return LearningRateScheduler(scheduler_class(optimizer, **kwargs))
+    new_scheduler = scheduler_class(
+        optimizer,
+        **kwargs,
+    )
+    return LearningRateScheduler(new_scheduler)

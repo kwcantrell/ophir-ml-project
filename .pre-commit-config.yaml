@@ -1,0 +1,36 @@
+# Pre-commit configuration for ophir-ml-project
+# Run with: pre-commit run --all-files
+# Setup with: pre-commit install
+
+repos:
+  # Ruff for linting and additional checks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.5
+    hooks:
+      - id: ruff
+        name: "Ruff linter"
+        args: ["--output-format=full"]
+        types_or: [python, pyi]
+
+  # MyPy for type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: "MyPy type checker"
+        args: ["--ignore-missing-imports", "--explicit-package-bases=src", "--exclude=models"]
+        additional_dependencies:
+          - torch>=2.0
+          - torchvision>=0.15
+
+  # Pytest for running tests before commit (recommended)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        name: "Remove trailing whitespace"
+      - id: end-of-file-fixer
+        name: "Ensure files end with a newline"
+      - id: check-merge-conflict
+        name: "Check for merge conflict markers"
+

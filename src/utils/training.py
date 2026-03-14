@@ -2,9 +2,9 @@
 Training loop utilities with early stopping, AMP, gradient clipping, etc.
 """
 
+from datetime import datetime, timezone
 import os
-from typing import Optional
-from datetime import datetime
+
 import torch
 
 
@@ -16,13 +16,13 @@ class EarlyStopping:
         patience: int = 5,
         min_delta: float = 0.01,
         better_than_last_metric: bool = True,
-        mode: str = "min"  # 'min' for loss, 'max' for accuracy
-    ):
+        mode: str = "min",  # 'min' for loss, 'max' for accuracy
+    ) -> None:
         """
         Args:
             patience: Number of epochs to wait before stopping
             min_delta: Minimum improvement required to reset patience counter
-            better_than_last_metric: Stop if current metric is worse than best seen (disabled by default)
+            better_than_last_metric: Stop if metric is worse than best seen (disabled by default)
             mode: 'min' to stop when loss stops decreasing, 'max' for accuracy
         """
         self.patience = patience
@@ -32,7 +32,7 @@ class EarlyStopping:
 
         self.best_metric = float("inf") if mode == "min" else -float("inf")
         self.counter = 0
-        self.stopped_epoch = None
+        self.stopped_epoch: int | None = None
 
     def __call__(self, epoch: int, metric: float) -> bool:
         """
@@ -72,20 +72,20 @@ class EarlyStopping:
 
         return False
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset early stopping state."""
         self.counter = 0
         self.stopped_epoch = None
 
 
 def save_checkpoint(
-    model,
-    optimizer=None,
-    scaler=None,
-    epoch: int = None,
-    metric: float = None,
-    filepath: str = "checkpoints/checkpoint.pth"
-):
+    model: torch.nn.Module,
+    optimizer: torch.optim.Optimizer | None = None,
+    scaler: torch.cuda.amp.GradScaler | None = None,
+    epoch: int | None = None,
+    metric: float | None = None,
+    filepath: str = "checkpoints/checkpoint.pth",
+) -> str:
     """
     Save a checkpoint with metadata.
 
@@ -103,7 +103,7 @@ def save_checkpoint(
         "model_state_dict": model.state_dict(),
         "optimizer_state_dict": optimizer.state_dict() if optimizer else None,
         "scaler_state_dict": scaler.state_dict() if scaler else None,
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
     # Ensure checkpoint directory exists
@@ -114,7 +114,7 @@ def save_checkpoint(
     return filepath
 
 
-def setup_mixed_precision() -> Optional[torch.cuda.amp.GradScaler]:
+def setup_mixed_precision() -> torch.cuda.amp.GradScaler | None:
     """
     Setup mixed precision training with GradScaler.
 
@@ -122,9 +122,8 @@ def setup_mixed_precision() -> Optional[torch.cuda.amp.GradScaler]:
         GradScaler instance (or None if CUDA not available)
     """
     if torch.cuda.is_available():
-        scaler = torch.cuda.amp.GradScaler(enabled=True)
+        scaler: torch.cuda.amp.GradScaler = torch.cuda.amp.GradScaler(enabled=True)
         print("Mixed precision training enabled")
         return scaler
-    else:
-        print("CUDA not available, using standard precision")
-        return None
+    print("CUDA not available, using standard precision")
+    return None

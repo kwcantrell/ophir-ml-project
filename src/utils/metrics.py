@@ -4,7 +4,6 @@ Model evaluation utilities using TorchMetrics.
 Provides pre-built metrics and custom evaluators for classification, regression, etc.
 """
 
-from typing import Union
 
 import torch
 import torch.nn.functional as F
@@ -121,7 +120,7 @@ class CustomEvaluator:
 
 
 def evaluate_classification(
-    logits: Union[torch.Tensor, dict[str, torch.Tensor]],
+    logits: torch.Tensor | dict[str, torch.Tensor],
     labels: torch.Tensor,
     num_classes: int = 10,
 ) -> dict[str, float]:

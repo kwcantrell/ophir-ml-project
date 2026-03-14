@@ -4,7 +4,6 @@ Training loop utilities with early stopping, AMP, gradient clipping, etc.
 
 from datetime import datetime, timezone
 import os
-from typing import Optional
 
 import torch
 
@@ -81,10 +80,10 @@ class EarlyStopping:
 
 def save_checkpoint(
     model: torch.nn.Module,
-    optimizer: Optional[torch.optim.Optimizer] = None,
-    scaler: Optional[torch.cuda.amp.GradScaler] = None,
-    epoch: Optional[int] = None,
-    metric: Optional[float] = None,
+    optimizer: torch.optim.Optimizer | None = None,
+    scaler: torch.cuda.amp.GradScaler | None = None,
+    epoch: int | None = None,
+    metric: float | None = None,
     filepath: str = "checkpoints/checkpoint.pth",
 ) -> str:
     """
@@ -115,7 +114,7 @@ def save_checkpoint(
     return filepath
 
 
-def setup_mixed_precision() -> Optional[torch.cuda.amp.GradScaler]:
+def setup_mixed_precision() -> torch.cuda.amp.GradScaler | None:
     """
     Setup mixed precision training with GradScaler.
 

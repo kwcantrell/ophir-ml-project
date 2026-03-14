@@ -27,7 +27,11 @@ class CustomEvaluator:
     """
 
     def __init__(
-        self, task: str = "multiclass", num_classes: int = 10, threshold: float = 0.5, **kwargs
+        self,
+        task: str = "multiclass",
+        num_classes: int = 10,
+        threshold: float = 0.5,
+        **kwargs: object,
     ):
         """
         Args:
@@ -79,9 +83,11 @@ class CustomEvaluator:
                 "mse": MeanSquaredError(**self._common_kwargs()),
                 "mae": MeanAbsoluteError(**self._common_kwargs()),
             }
-        raise ValueError("Unknown task type. Supported tasks: binary, multiclass, multilabel, regression")
+        raise ValueError(
+            "Unknown task type. Supported tasks: binary, multiclass, multilabel, regression"
+        )
 
-    def _common_kwargs(self):
+    def _common_kwargs(self) -> dict[str, object]:
         """Get common kwargs for all metrics."""
         return {"ndim": 1}
 

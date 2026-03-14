@@ -33,7 +33,7 @@ class EarlyStopping:
 
         self.best_metric = float("inf") if mode == "min" else -float("inf")
         self.counter = 0
-        self.stopped_epoch = None
+        self.stopped_epoch: int | None = None
 
     def __call__(self, epoch: int, metric: float) -> bool:
         """
@@ -73,20 +73,20 @@ class EarlyStopping:
 
         return False
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset early stopping state."""
         self.counter = 0
         self.stopped_epoch = None
 
 
 def save_checkpoint(
-    model,
-    optimizer=None,
-    scaler=None,
-    epoch: int = None,
-    metric: float = None,
+    model: torch.nn.Module,
+    optimizer: Optional[torch.optim.Optimizer] = None,
+    scaler: Optional[torch.cuda.amp.GradScaler] = None,
+    epoch: Optional[int] = None,
+    metric: Optional[float] = None,
     filepath: str = "checkpoints/checkpoint.pth",
-):
+) -> str:
     """
     Save a checkpoint with metadata.
 
@@ -123,7 +123,7 @@ def setup_mixed_precision() -> Optional[torch.cuda.amp.GradScaler]:
         GradScaler instance (or None if CUDA not available)
     """
     if torch.cuda.is_available():
-        scaler = torch.cuda.amp.GradScaler(enabled=True)
+        scaler: torch.cuda.amp.GradScaler = torch.cuda.amp.GradScaler(enabled=True)
         print("Mixed precision training enabled")
         return scaler
     print("CUDA not available, using standard precision")

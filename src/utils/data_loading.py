@@ -4,19 +4,18 @@ Data loading utilities with optimized DataLoaders.
 Implements producer-consumer pattern for optimal GPU utilization.
 """
 
-import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 
 def create_dataloader(
-    dataset,
+    dataset: Dataset,
     batch_size: int = 32,
     shuffle: bool = False,
     num_workers: int = 0,
     pin_memory: bool = True,
     prefetch_factor: int = 2,
     persistent_workers: bool = False,
-    **kwargs,
+    **kwargs: object,
 ) -> DataLoader:
     """
     Create an optimized DataLoader with producer-consumer pattern.
@@ -39,6 +38,8 @@ def create_dataloader(
     Returns:
         Optimized DataLoader instance
     """
+    # Cast kwargs to match DataLoader signature for type checking
+    # type: ignore[misc]
     return DataLoader(
         dataset,
         batch_size=batch_size,
@@ -47,11 +48,11 @@ def create_dataloader(
         pin_memory=pin_memory,
         prefetch_factor=prefetch_factor,
         persistent_workers=persistent_workers,
-        **kwargs,
+        **kwargs,  # type: ignore[arg-type]
     )
 
 
-def get_optimal_num_workers(num_cpus: int = None) -> int:
+def get_optimal_num_workers(num_cpus: int | None = None) -> int:
     """
     Get optimal number of workers based on CPU availability.
 
@@ -61,14 +62,17 @@ def get_optimal_num_workers(num_cpus: int = None) -> int:
     Returns:
         Recommended number of workers for DataLoader
     """
+    import sys
+
+    import torch
+
     if num_cpus is None:
         num_cpus = torch.get_num_threads()
     # Limit workers based on system RAM and CPU count
     # Generally: 0 workers on Windows/Mac, up to 8-16 on Linux with 32GB+ RAM
-    import sys
 
     if sys.platform.startswith("win"):
-        return 0
+        return 0  # type: ignore[return-value]
     if num_cpus < 4:
-        return min(1, max(0, num_cpus - 1))
-    return min(4, max(0, num_cpus // 2))
+        return min(1, max(0, num_cpus - 1))  # type: ignore[return-value]
+    return min(4, max(0, num_cpus // 2))  # type: ignore[return-value]

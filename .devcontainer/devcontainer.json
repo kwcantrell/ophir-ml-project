@@ -24,10 +24,7 @@
       "extensions": [
         "ms-python.python",              // Python language support
         "ms-python.vscode-pylance",     // Python type checking
-        "ms-python.black-formatter",     // Black code formatter
-        "ms-python.isort",              // Python import sorter
         "ms-python.mypy-type-checker",  // mypy static type checker
-        "ms-python.flake8"              // Python linting
       ]
     }
   }

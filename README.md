@@ -9,7 +9,7 @@ A production-ready PyTorch machine learning project template following industry 
 - W&B experiment tracking integration
 - TorchMetrics-based evaluation utilities
 - Early stopping and checkpoint management
-- Comprehensive linting with Ruff/Black/Mypy
+- Comprehensive linting and formatting with Ruff/MyPy
 - Pre-commit hooks for code quality enforcement
 
 [View on GitHub](https://github.com/kwcantrell/ophir-ml-project) | [Documentation](docs/modules.md) | [Best Practices](docs/best-practices-guide.md)
@@ -81,7 +81,7 @@ wandb offlinelogs
 # Run tests
 uv run pytest tests/ -v --cov=src
 
-# Format code (Black + Ruff)
+# Format code with Ruff
 pre-commit run --all-files
 
 # Check types
@@ -96,7 +96,6 @@ uv run mypy src/ models/
 |----------|---------------|-------------|
 | **Package Manager** | UV | Fast, PEP 621 compliant package management |
 | **Linter** | Ruff | Fast Python linter with formatting support |
-| **Formatter** | Black | Opinionated code formatter (line-length: 100) |
 | **Type Checker** | MyPy | Static type checking for Python |
 | **Test Runner** | pytest | Comprehensive test framework with coverage |
 | **Tracking** | W&B | Experiment tracking and visualization |
@@ -106,9 +105,8 @@ uv run mypy src/ models/
 
 1. **Install dependencies** with `uv sync` (uses uv.lock)
 2. **Run pre-commit hooks** before commits: `pre-commit run --all-files`
-3. **Format code** with Black and Ruff automatically via pre-commit
-4. **Type check** with MyPy for production code
-5. **Run tests** with pytest coverage reporting
+3. **Type check** with MyPy for production code
+4. **Run tests** with pytest coverage reporting
 
 ### uv Commands Reference
 
@@ -379,6 +377,7 @@ requires-python = ">=3.9"
 dev = [
     "pytest>=7.4",
     "mypy>=1.8",
+    "ruff>=0.4.5",
 ]
 ```
 

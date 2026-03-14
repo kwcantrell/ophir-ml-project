@@ -3,14 +3,6 @@
 # Setup with: pre-commit install
 
 repos:
-  # Black for code formatting (Black-compatible with Ruff)
-  - repo: https://github.com/psf/black
-    rev: 24.4.0
-    hooks:
-      - id: black
-        name: "Black formatter"
-        args: ["--line-length=100"]
-
   # Ruff for linting and additional checks
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.5
@@ -42,10 +34,3 @@ repos:
       - id: check-merge-conflict
         name: "Check for merge conflict markers"
 
-  # Blacken-docs for formatting docstrings (optional but recommended)
-  - repo: https://github.com/asottile/blacken-docs
-    rev: 1.16.0
-    hooks:
-      - id: blacken-docs
-        name: "Blacken docstrings"
-        additional_dependencies: [black]

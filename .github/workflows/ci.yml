@@ -41,10 +41,9 @@ jobs:
         run: |
           uv lock --check || (echo "Lockfile mismatch!" && exit 1)
 
-      - name: Run linters (ruff, black)
+      - name: Run linters (ruff)
         run: |
           uv run ruff check src models
-          uv run black --check src models --diff || (echo "Code style issues!" && exit 1)
 
       # NOTE: mypy type checking is currently skipped due to pre-existing annotation issues.
       # Consider adding it once all functions have type annotations.

@@ -2,8 +2,8 @@
 Training loop utilities with early stopping, AMP, gradient clipping, etc.
 """
 
-import os
 from datetime import datetime, timezone
+import os
 from typing import Optional
 
 import torch
@@ -126,6 +126,5 @@ def setup_mixed_precision() -> Optional[torch.cuda.amp.GradScaler]:
         scaler = torch.cuda.amp.GradScaler(enabled=True)
         print("Mixed precision training enabled")
         return scaler
-    else:
-        print("CUDA not available, using standard precision")
-        return None
+    print("CUDA not available, using standard precision")
+    return None

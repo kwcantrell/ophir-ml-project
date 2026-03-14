@@ -9,7 +9,7 @@ This module provides a production-ready training loop with:
 - Progress logging
 """
 
-from typing import Callable
+from collections.abc import Callable
 
 import torch
 

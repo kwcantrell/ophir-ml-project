@@ -17,8 +17,7 @@ dev = [
     # Development dependencies for uv sync
     "pytest>=7.4",
     "pytest-cov>=4.1",
-    "black>=24.0",
-    "ruff>=0.1",
+    "ruff>=0.6",
     "mypy>=1.8",
     "pre-commit>=4.5.1",
 ]
@@ -29,8 +28,7 @@ dev = [
     # Development and testing tools
     "pytest>=7.4",
     "pytest-cov>=4.1",
-    "black>=24.0",
-    "ruff>=0.6",  # Updated to 0.6+ for better rules
+    "ruff>=0.6",  # linting, formatting, and auto-fix
     "mypy>=1.8",
 ]
 
@@ -44,50 +42,140 @@ packages = ["src", "models"]
 # Ruff configuration - line length, target Python version
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+# Target Python version matches requires-python >=3.10
+target-version = "py310"
 
 # Ruff linting rules configuration
 [tool.ruff.lint]
-select = ["E", "F", "W", "UP", "I", "B", "C4", "COM", "DTZ", "T10", "EXE"]
-ignore = [
-    # Black-compatible formatting rules (B) - use Black for formatting instead
-    "B",
-    # Common false positives for ML projects
-    "COM812",  # Trailing comma missing (Black handles this)
+# Comprehensive rule set for ML projects:
+# - E/F/W: pycodestyle errors, warnings, and line length (handled by Black)
+# - UP: pyupgrade (modernize Python syntax)
+# - I: isort (import sorting - handled by Black)
+# - C4: flake8-comprehensions (collection comprehensions)
+# - DTZ: timezone expressions (use datetime.now(tz) not datetime.utcnow())
+# - T10: flake8-debugger (debugger in tests)
+# - EXE: flake8-executable (file header comments)
+# - A: flake8-builtins (avoid shadowing builtins)
+# - ISC: flake8-implicit-str-concat (implicit string concatenation)
+# - ICN: flake8-import-conventions (import naming conventions)
+# - N: flake8-quotes (quotes)
+# - PIE: flake8-pie (PIE operations)
+# - PGH: pygrep-hooks (regex-based git-ignore patterns)
+# - PT: flake8-pytest-style (pytest style)
+# - PYI: flake8-pyi (pyi file rules)
+# - Q: flake8-quotes (quotes)
+# - RSE: flake8-return (return type comments)
+# - RET: flake8-return (return style)
+# - SIM: flake8-simplify (simplification rules)
+# - SLF: flake8-self (private member access)
+# - SLOT: flake8-slots (slot usage)
+# - TCH: flake8-type-checking (type checking imports)
+# - TID: flake8-tidy-imports (tidy import conventions)
+# - TRY: flake8-try (try/except style)
+# - FLY: flynt (convert f-strings to format)
+select = [
+    "E", "F", "W",  # pycodestyle
+    "UP",  # pyupgrade
+    "I",  # isort
+    "C4",  # flake8-comprehensions
+    "DTZ",  # timezone expressions
+    "T10",  # flake8-debugger
+    "EXE",  # flake8-executable
+    "A",  # flake8-builtins
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "N",  # flake8-quotes
+    "PIE",  # flake8-pie
+    "PGH",  # pygrep-hooks
+    "PT",  # flake8-pytest-style
+    "PYI",  # flake8-pyi
+    "Q",  # flake8-quotes
+    "RSE",  # flake8-return
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "SLF",  # flake8-self
+    "SLOT",  # flake8-slots
+    "TCH",  # flake8-type-checking
+    "TID",  # flake8-tidy-imports
+    "TRY",  # flake8-try
+    "FLY",  # flynt
+    # ANN: type annotations (complements mypy)
+    "ANN",
+    # PERF: performance anti-patterns (common in ML)
+    "PERF",
+    # S: security (relevant for ML projects handling sensitive data)
+    "S",
+    # NPY: NumPy-specific rules
+    "NPY",
 ]
+ignore = [
+    # Common false positives for ML projects
+    "COM812",  # Trailing comma missing (handled by Black)
+    # ANN: Allow missing type annotations in specific cases
+    "ANN001",  # Function missing type annotation
+    "ANN201",  # Missing return type annotation for non-missing return type
+    # NPY: Allow numpy imports at top level
+    "NPY001",  # Allow numpy in public path
+    # S: Security rules - too strict for ML training code
+    "S105",  # Possible hardcoded password
+    "S106",  # Possible hardcoded password in argument
+    "S107",  # Possible hardcoded password in variable name
+    # PERF: Some performance rules can be noisy
+    "PERF203",  # `timeout=...` creates a potential infinite loop in `while True`
+]
+# Disable built-in checks (use Black for formatting)
+# B rules are now included in select above for autofix compatibility
 
-# Per-file ignores for flexibility
+# Per-file ignores for flexibility and ML project patterns
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"]  # Allow assert statements in tests
 "models/__init__.py" = ["I001"]  # Ignore import sorting for commented example imports
+# src/train/ - Training utilities
+"src/train/**/*.py" = ["ANN204", "ANN003"]  # Legacy missing __init__ return types, **kwargs for flexible APIs
+# src/utils/ - Utility files with flexible APIs
+"src/utils/**/*.py" = ["ANN003", "UP045", "ANN204"]  # **kwargs, Optional, and __init__ patterns are intentional
+# src/utils/metrics.py - ML-specific patterns
+"src/utils/metrics.py" = [
+    # N812: torch.nn.functional as F is standard PyTorch convention
+    "N812",
+    # TRY003: Long error messages are helpful for debugging
+    "TRY003",
+    # SIM108: Ternary operators are less readable for ML operations
+    "SIM108",
+    # ANN202: Private methods like _common_kwargs don't need return annotations in ML code
+    "ANN202",
+    # ANN204: __init__ methods don't need return type annotations (returns None implicitly)
+    "ANN204",
+    # ANN003: **kwargs is intentional in flexible ML APIs
+    "ANN003",
+    # ANN101: Missing type annotation for argument in favor of builtin
+    "ANN101",
+    # UP007: Union is used for clearer multi-type hints in legacy code
+    "UP007",
+    # E501: Line too long - Black handles this
+    "E501",
+]
+# src/utils/seeds.py - legacy numpy seeding patterns
+"src/utils/seeds.py" = ["NPY002"]  # Legacy np.random.seed is still used
 
-# Ruff isort configuration (compatible with Black)
+# Ruff isort configuration (compatible with Black-style formatting)
 [tool.ruff.lint.isort]
 known-first-party = ["ophir_ml_project", "src", "models"]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 lines-after-imports = 2
+force-sort-within-sections = true
+
+# Ruff autofix configuration
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+skip-magic-trailing-comma = false
+preview = false
 
 # McCabe complexity configuration
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
-# Black configuration (used by pre-commit and for formatting)
-[tool.black]
-line-length = 100
-target-version = ["py39"]
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-    | \.venv
-    | \.tox
-    | build
-    | dist
-    | migrations
-    | __pycache__
-    | \.claude  # IDE/project tools directory
-)/
-'''
 
 # MyPy configuration for type checking
 [tool.mypy]

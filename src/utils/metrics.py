@@ -52,7 +52,7 @@ class CustomEvaluator:
                 "recall": Recall(task="binary", threshold=self.threshold),
                 "f1_score": F1Score(task="binary", threshold=self.threshold),
             }
-        elif self.task == "multiclass":
+        if self.task == "multiclass":
             return {
                 "accuracy": Accuracy(task="multiclass", num_classes=self.num_classes),
                 "precision_macro": Precision(
@@ -74,13 +74,12 @@ class CustomEvaluator:
                     task="multiclass", num_classes=self.num_classes, ignore_index=-100
                 ),
             }
-        elif self.task == "regression":
+        if self.task == "regression":
             return {
                 "mse": MeanSquaredError(**self._common_kwargs()),
                 "mae": MeanAbsoluteError(**self._common_kwargs()),
             }
-        else:
-            raise ValueError(f"Unknown task type: {self.task}")
+        raise ValueError("Unknown task type. Supported tasks: binary, multiclass, multilabel, regression")
 
     def _common_kwargs(self):
         """Get common kwargs for all metrics."""
@@ -99,10 +98,7 @@ class CustomEvaluator:
             Dictionary of metric names to values
         """
         # Normalize logits to probabilities if needed
-        if logits.shape[-1] == 2:  # Binary case
-            probs = torch.sigmoid(logits)
-        else:
-            probs = F.softmax(logits, dim=-1)
+        probs = torch.sigmoid(logits) if logits.shape[-1] == 2 else F.softmax(logits, dim=-1)
 
         preds = probs.argmax(dim=-1) if self.task != "binary" else (probs > self.threshold).float()
 

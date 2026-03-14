@@ -2,8 +2,6 @@
 Common training utilities including learning rate scheduling and callbacks.
 """
 
-from typing import Optional
-
 import torch
 
 
@@ -21,7 +19,7 @@ class LearningRateScheduler:
     def step(
         self,
         epoch: int,
-        current_step: Optional[int] = None,
+        current_step: int | None = None,
     ) -> "LearningRateScheduler":
         """
         Step the scheduler.

@@ -69,7 +69,6 @@ def get_optimal_num_workers(num_cpus: int = None) -> int:
 
     if sys.platform.startswith("win"):
         return 0
-    elif num_cpus < 4:
+    if num_cpus < 4:
         return min(1, max(0, num_cpus - 1))
-    else:
-        return min(4, max(0, num_cpus // 2))
+    return min(4, max(0, num_cpus // 2))

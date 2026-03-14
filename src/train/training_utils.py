@@ -18,7 +18,11 @@ class LearningRateScheduler:
         """Initialize with an existing PyTorch scheduler."""
         self.scheduler = scheduler
 
-    def step(self, epoch: int, current_step: Optional[int] = None) -> "LearningRateScheduler":
+    def step(
+        self,
+        epoch: int,
+        current_step: Optional[int] = None,
+    ) -> "LearningRateScheduler":
         """
         Step the scheduler.
 
@@ -49,7 +53,9 @@ class LearningRateScheduler:
 
 
 def get_lr_scheduler(
-    optimizer: torch.optim.Optimizer, scheduler_type: str = "CosineAnnealingLR", **kwargs
+    optimizer: torch.optim.Optimizer,
+    scheduler_type: str = "CosineAnnealingLR",
+    **kwargs,
 ) -> LearningRateScheduler:
     """
     Create a learning rate scheduler.
@@ -73,4 +79,8 @@ def get_lr_scheduler(
     }
 
     scheduler_class = schedulers.get(scheduler_type, torch.optim.lr_scheduler.CosineAnnealingLR)
-    return LearningRateScheduler(scheduler_class(optimizer, **kwargs))
+    new_scheduler = scheduler_class(
+        optimizer,
+        **kwargs,
+    )
+    return LearningRateScheduler(new_scheduler)

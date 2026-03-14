@@ -13,7 +13,22 @@
   "forwardPorts": [11434],
   "mounts": [
     "source=${localWorkspaceFolder}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.ollama,target=/home/vscode/.ollama,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.ollama,target=/home/vscode/.ollama,type=bind,consistency=cached",
+    "source=${localWorkspaceFolder}/.venv,target=/home/vscode/.venv,type=bind,consistency=cached"
   ],
-  "runArgs": ["--gpus=all"]
+  "postCreateCommand": "uv sync --frozen",
+  "runArgs": ["--gpus=all"],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",              // Python language support
+        "ms-python.vscode-pylance",     // Python type checking
+        "ms-python.black-formatter",     // Black code formatter
+        "ms-python.isort",              // Python import sorter
+        "ms-python.mypy-type-checker",  // mypy static type checker
+        "ms-python.flake8"              // Python linting
+      ]
+    }
+  }
 }

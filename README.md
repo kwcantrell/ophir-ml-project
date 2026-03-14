@@ -365,7 +365,29 @@ ollama serve &
 
 > **Note:** The container includes Ollama installation but leaves model pulling to you for manual control over resources and privacy.
 
-> **See more:** [Features README](/.devcontainer/features/README.md) - Why devcontainer features were removed
+> **See more:** [Best Practices Overview](#best-practices-summary) - Security design and usage guidelines
+
+---
+
+## 🏆 Best Practices Summary
+
+### ✅ What This Repo Does Well
+
+| Area | Implementation | Why It Matters |
+|------|----------------|-----------------|
+| **Security** | Ollama as root + Claude Code as vscode user only | Prevents system-wide compromise; least privilege |
+| **Minimal Base** | Ubuntu with only curl, zstd | Small attack surface, faster builds |
+| **Selective Mounts** | Only `.claude` + `~/.ollama` exposed | No accidental credential exposure |
+| **Port Forwarding** | Ollama API (11434) forwarded to host | Enables external model connections |
+| **Documentation** | Comprehensive security rationale & usage guides | Users understand the why, not just the how |
+
+### 📋 Best Practices for Using This Environment
+
+1. **Review the Dockerfile first** - Understand what gets installed and why
+2. **Check mount configuration** - See `.devcontainer/devcontainer.json` before mounting sensitive paths
+3. **Pull models manually** - Decide which LLMs you need (don't auto-pull everything)
+4. **Stop when done** - Reset agent context by stopping container; config persists in mounts
+5. **Share with colleagues** - Git-reproducible environment means same tools everywhere
 
 ---
 

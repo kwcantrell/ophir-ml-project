@@ -16,7 +16,7 @@ import torch
 
 def train_epoch(
     model: torch.nn.Module,
-    dataloader,
+    dataloader: torch.utils.data.DataLoader,
     criterion: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
     device: str = "cuda",
@@ -84,7 +84,7 @@ def train_epoch(
 @torch.no_grad()
 def validate(
     model: torch.nn.Module,
-    dataloader,
+    dataloader: torch.utils.data.DataLoader,
     criterion: torch.nn.Module,
     device: str = "cuda",
 ) -> tuple[float, float]:
@@ -103,10 +103,11 @@ def validate(
     model.eval()
     total_loss = 0.0
     correct = 0
-    num_samples = len(dataloader.dataset)
+    num_samples = 0
 
     for data, target in dataloader:
         data, target = data.to(device), target.to(device)
+        num_samples += data.size(0)
 
         with torch.amp.autocast("cuda") if device == "cuda" else torch.no_grad():
             output = model(data)

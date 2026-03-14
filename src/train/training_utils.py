@@ -45,7 +45,7 @@ class LearningRateScheduler:
             "epoch": self.scheduler.last_epoch,
         }
 
-    def load_state_dict(self, state_dict: dict):
+    def load_state_dict(self, state_dict: dict) -> None:
         """Load state dictionary to restore scheduler."""
         self.scheduler.load_state_dict(state_dict["scheduler"])
 
@@ -53,7 +53,7 @@ class LearningRateScheduler:
 def get_lr_scheduler(
     optimizer: torch.optim.Optimizer,
     scheduler_type: str = "CosineAnnealingLR",
-    **kwargs,
+    **kwargs: object,
 ) -> LearningRateScheduler:
     """
     Create a learning rate scheduler.

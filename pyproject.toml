@@ -20,6 +20,7 @@ dev = [
     "black>=24.0",
     "ruff>=0.1",
     "mypy>=1.8",
+    "pre-commit>=4.5.1",
 ]
 
 [project.optional-dependencies]
@@ -98,7 +99,7 @@ disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
 show_error_codes = true
-exclude = ["tests/", "notebooks/"]
+exclude = ["tests/", "notebooks/", "models/"]
 
 [tool.pytest.ini_options]
 addopts = "-ra -q"

@@ -69,4 +69,3 @@ Description of how the system works after
 ```migration-steps
 Step-by-step instructions for migrating to new behavior
 ```
-

@@ -108,11 +108,7 @@ def validate(
     for data, target in dataloader:
         data, target = data.to(device), target.to(device)
 
-        with (
-            torch.amp.autocast("cuda")
-            if device == "cuda"
-            else torch.no_grad()
-        ):
+        with torch.amp.autocast("cuda") if device == "cuda" else torch.no_grad():
             output = model(data)
             loss = criterion(output, target)
 

@@ -11,6 +11,7 @@
 **Usage Example:**
 ```python
 from src.utils import set_seeds
+
 set_seeds(seed=42)  # Full reproducibility
 ```
 
@@ -32,7 +33,7 @@ train_loader = create_dataloader(
     num_workers=4,
     pin_memory=True,
     prefetch_factor=2,
-    persistent_workers=True  # For multi-epoch training
+    persistent_workers=True,  # For multi-epoch training
 )
 ```
 
@@ -50,10 +51,7 @@ train_loader = create_dataloader(
 ```python
 from src.utils import WandBLogger
 
-logger = WandBLogger(
-    project_name="my-project",
-    entity="your-org"
-)
+logger = WandBLogger(project_name="my-project", entity="your-org")
 
 # Log metrics
 logger.log_metrics({"loss": 0.5, "acc": 0.75}, step=epoch)
@@ -131,7 +129,9 @@ for epoch in range(num_epochs):
         device=device,
         scaler=scaler,
         lr_scheduler=lr_scheduler,
-        epoch_progress_callback=lambda idx, tot, loss: print(f"Step {idx}/{tot}, loss={loss:.4f}")
+        epoch_progress_callback=lambda idx, tot, loss: print(
+            f"Step {idx}/{tot}, loss={loss:.4f}"
+        ),
     )
     val_loss, val_acc = validate(model, val_loader, criterion)
 ```

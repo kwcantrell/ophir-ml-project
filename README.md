@@ -269,20 +269,26 @@ The best practices guide covers:
 ```python
 # 1. Reproducibility setup
 from src.utils import set_seeds
+
 set_seeds(seed=42)
 
 # 2. Optimized DataLoader configuration
 from torch.utils.data import DataLoader
 from src.utils.data_loading import create_dataloader
+
 train_loader = create_dataloader(
     train_dataset,
-    batch_size=32, shuffle=True,
-    num_workers=4, pin_memory=True, prefetch_factor=2,
-    persistent_workers=True
+    batch_size=32,
+    shuffle=True,
+    num_workers=4,
+    pin_memory=True,
+    prefetch_factor=2,
+    persistent_workers=True,
 )
 
 # 3. Training loop with AMP and early stopping
 from src.utils import EarlyStopping, setup_mixed_precision
+
 scaler = setup_mixed_precision()
 early_stopping = EarlyStopping(patience=5, min_delta=0.01)
 

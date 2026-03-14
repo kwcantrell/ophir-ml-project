@@ -11,7 +11,6 @@ This module contains only model architectures - training logic should be in sepa
 # from utils.data_loading import create_dataloader, get_optimal_num_workers
 # from utils.experiment_tracking import WandBLogger, setup_experiment_tracking
 
-
 from models.resnet import ResNet18
 
 

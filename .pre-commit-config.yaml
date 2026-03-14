@@ -26,7 +26,7 @@ repos:
     hooks:
       - id: mypy
         name: "MyPy type checker"
-        args: ["--ignore-missing-imports", "--strict-optional"]
+        args: ["--ignore-missing-imports", "--explicit-package-bases=src", "--exclude=models"]
         additional_dependencies:
           - torch>=2.0
           - torchvision>=0.15

@@ -12,8 +12,9 @@ dependencies = [
     "tqdm>=4.66",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
+    # Development dependencies for uv sync
     "pytest>=7.4",
     "pytest-cov>=4.1",
     "black>=24.0",

@@ -261,7 +261,7 @@ This project uses **uv** for fast, reliable Python package management.
 
 ### What is uv?
 
-[uv](https://github.com/astral-sh/uv) is an extremely fast Python package manager and interpreter written in Rust. It's up to 10x faster than pip/virtualenv.
+[uv](https://github.com/astral-sh/uv) is an extremely fast Python package manager and interpreter written in Rust (10x+ faster than pip). It supports PEP 621 `pyproject.toml` workflows natively.
 
 ### Quick Start with UV
 
@@ -269,56 +269,75 @@ This project uses **uv** for fast, reliable Python package management.
 # Install uv if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Create virtual environment
-uv venv .venv
+# Navigate to project directory
+cd /path/to/project
 
-# Activate the environment
-source .venv/bin/activate  # On Linux/Mac
+# Create virtual environment and sync dependencies
+uv venv .venv && source .venv/bin/activate  # Linux/Mac
 # or
-.venv\Scripts\activate.bat  # On Windows
+uv venv .venv && .venv\Scripts\activate.bat   # Windows
 
-# Install dependencies from requirements.txt
-uv pip install -r requirements.txt
-
-# Or add packages interactively
-uv pip install torch torchvision torchaudio
-```
-
-### uv Commands Cheat Sheet
-
-```bash
-# Create new project with template
-uv init <project-name> --python 3.10
-
-# Sync project (installs dependencies)
+# Sync all dependencies from pyproject.toml
 uv sync
 
-# Run Python script with uv
-uv run python my_script.py
-
-# Add dev dependencies
-uv add torch torchvision
-
-# Run without activating venv
-uv run pytest tests/
-
-# Show dependency tree
-uv pip tree --graph | dot -Tpng > deps.png
-
-# Check for updates
-uv self update
+# Run any command with uv (auto-resolves dependencies)
+uv run python -c "print('Hello!')"
 ```
 
-### Requirements File
+### Modern `pyproject.toml` Workflow
 
-The `requirements.txt` file in the project root contains production dependencies. Use it with:
+This project uses PEP 621-style configuration:
 
+**Install production dependencies:**
 ```bash
-# Install from requirements
-uv pip install -r requirements.txt
-
-# Or use uv pip directly
-uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+uv sync --frozen  # Uses uv.lock for reproducible builds
 ```
+
+**Add a new package:**
+```bash
+uv add numpy pandas
+```
+
+**Add dev dependency:**
+```bash
+uv add --dev pytest ruff mypy
+```
+
+**Run tests without activating venv:**
+```bash
+uv run pytest tests/ -v --cov=src
+```
+
+**Check dependencies graph:**
+```bash
+uv pip tree --graph 2>/dev/null | dot -Tpng > deps.png
+```
+
+### pyproject.toml Structure
+
+The project uses modern PEP 621 syntax:
+
+```toml
+[project]
+name = "ophir-ml-project"
+dependencies = ["torch>=2.0", ...]
+requires-python = ">=3.9"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4",
+    "mypy>=1.8",
+]
+```
+
+This allows `uv sync` to resolve all dependencies automatically.
+
+### Notes on Requirements.txt
+
+For backwards compatibility, a `requirements.txt` file is provided. However:
+
+- Use `uv sync` for development (resolves from pyproject.toml)
+- Use `uv pip install -r requirements.txt` only when necessary
+- The `pyproject.toml` + `uv.lock` combination provides better reproducibility
 
 ---

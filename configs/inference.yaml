@@ -1,0 +1,22 @@
+# Inference/deployment configuration
+
+model:
+  architecture: resnet18
+  device: cuda
+  dtype: fp32
+
+data:
+  batch_size: 64
+  data_dir: ../data
+  transform_name: normalize
+
+experiment_tracking:
+  enabled: false
+
+export:
+  format: onnx
+  opset_version: 14
+
+performance:
+  max_latency_ms: 50
+  throughput_target_qps: 10

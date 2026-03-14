@@ -1,0 +1,18 @@
+# Evaluation configuration
+
+model:
+  architecture: resnet18
+  device: cuda
+
+data:
+  batch_size: 128
+  data_dir: ../data
+
+experiment_tracking:
+  enabled: true
+  platform: wandb
+  tags:
+    - evaluation
+
+logging:
+  progress_interval: null

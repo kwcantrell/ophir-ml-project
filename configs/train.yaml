@@ -1,0 +1,33 @@
+# Training configuration
+model:
+  num_classes: 10
+  architecture: resnet18
+
+data:
+  batch_size: 32
+  data_dir: ../data
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+
+training:
+  optimizer: adam
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs: 50
+  gradient_accumulation_steps: 1
+  grad_clip_max_norm: 1.0
+
+device:
+  cuda_benchmark: true
+  mixed_precision: false
+
+experiment_tracking:
+  enabled: true
+  platform: wandb
+  project_name: pytorch-mnist-example
+  entity: your-organization
+
+logging:
+  progress_interval: 50
+  save_frequency: 1

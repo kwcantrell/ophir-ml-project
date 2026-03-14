@@ -117,10 +117,10 @@ The `.devcontainer/devcontainer.json` uses bind mounts for:
 ### Security Checklist Before Sharing Repo
 
 - [x] `.dockerignore` exists at project root - excludes build artifacts, node_modules, IDE folders
-- [ ] No `.env` or credential files committed to repo (except managed credentials)
-- [ ] Workspace doesn't contain sensitive data (keys, passwords)
-- [ ] README documents security considerations and mount strategy
-- [ ] `.gitignore` configured to prevent accidental commits of work-in-progress
+- [x] No `.env` or credential files committed to repo (except managed credentials)
+- [x] Workspace doesn't contain sensitive data (keys, passwords)
+- [x] README documents security considerations and mount strategy
+- [x] `.gitignore` configured to prevent accidental commits of work-in-progress
 
 ---
 
@@ -157,6 +157,52 @@ docker volume prune --filter label=com.docker.compose.project=devcontainer  # op
 - ✅ Workspace files persist (mounted)
 - ✅ Model cache persists (`~/.ollama` mounted)
 - ⚠️ Agent-created intermediate files do NOT persist
+
+---
+
+## 🗝️ Handling Secrets and Credentials
+
+### Never Store Credentials in Workspace
+
+**CRITICAL:** Never store secrets (API keys, passwords, tokens) directly in your workspace folder or git repository. These will be exposed to the container.
+
+### Standard Practices for Secret Management
+
+**Use mounted secret files (if absolutely necessary):**
+```jsonc
+// devcontainer.json - mount a secure secret location
+{
+  "mounts": [
+    {
+      "type": "bind",
+      "source": "${localEnv:HOME}/.config/secrets",
+      "target": "/home/vscode/.config/secrets"
+    }
+  ]
+}
+```
+
+**Recommended alternatives:**
+- Use environment variables set in your shell (not committed to repo)
+- Use Docker secrets for swarm mode (if applicable)
+- Use secret management tools (Vault, AWS Secrets Manager, etc.)
+- Pass credentials via CI/CD pipeline at build time
+
+### Detecting Secret Exposure
+
+Before committing code, run these checks:
+```bash
+# Check for common secret patterns in git history
+git log -p --all | grep -iE "(password|secret|api_key|token)"
+
+# Check current .env files before commit
+find . -name ".env*" -exec cat {} \; 2>/dev/null
+```
+
+**If secrets are detected:**
+1. Remove from workspace
+2. Add to `.gitignore` if applicable
+3. Rotate any exposed credentials immediately
 
 ---
 

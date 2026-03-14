@@ -7,6 +7,7 @@ Provides automatic logging for metrics, images, hyperparameters, and checkpoints
 import os
 from typing import Optional
 
+
 try:
     import wandb
 except ImportError:
@@ -17,12 +18,7 @@ class WandBLogger:
     """Weights & Biases experiment logger."""
 
     def __init__(
-        self,
-        project_name: str,
-        entity: str = None,
-        name: str = None,
-        notes: str = None,
-        **kwargs
+        self, project_name: str, entity: str = None, name: str = None, notes: str = None, **kwargs
     ):
         """
         Args:
@@ -58,7 +54,7 @@ class WandBLogger:
             name=self.name,
             notes=self.notes,
             config=kwargs.pop("config", {}),
-            **kwargs
+            **kwargs,
         )
         return self
 
@@ -137,12 +133,7 @@ def setup_experiment_tracking(config, **kwargs) -> Optional[WandBLogger]:
     if not tracking.get("enabled", False):
         return None
 
-    platform = tracking.get("platform", "wandb")
     project_name = tracking.get("project_name", "pytorch-experiments")
     entity = tracking.get("entity", os.environ.get("WANDB_ENTITY"))
 
-    return WandBLogger(
-        project_name=project_name,
-        entity=entity,
-        **kwargs
-    )
+    return WandBLogger(project_name=project_name, entity=entity, **kwargs)

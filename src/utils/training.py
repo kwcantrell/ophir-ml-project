@@ -3,8 +3,9 @@ Training loop utilities with early stopping, AMP, gradient clipping, etc.
 """
 
 import os
+from datetime import datetime, timezone
 from typing import Optional
-from datetime import datetime
+
 import torch
 
 
@@ -16,13 +17,13 @@ class EarlyStopping:
         patience: int = 5,
         min_delta: float = 0.01,
         better_than_last_metric: bool = True,
-        mode: str = "min"  # 'min' for loss, 'max' for accuracy
-    ):
+        mode: str = "min",  # 'min' for loss, 'max' for accuracy
+    ) -> None:
         """
         Args:
             patience: Number of epochs to wait before stopping
             min_delta: Minimum improvement required to reset patience counter
-            better_than_last_metric: Stop if current metric is worse than best seen (disabled by default)
+            better_than_last_metric: Stop if metric is worse than best seen (disabled by default)
             mode: 'min' to stop when loss stops decreasing, 'max' for accuracy
         """
         self.patience = patience
@@ -84,7 +85,7 @@ def save_checkpoint(
     scaler=None,
     epoch: int = None,
     metric: float = None,
-    filepath: str = "checkpoints/checkpoint.pth"
+    filepath: str = "checkpoints/checkpoint.pth",
 ):
     """
     Save a checkpoint with metadata.
@@ -103,7 +104,7 @@ def save_checkpoint(
         "model_state_dict": model.state_dict(),
         "optimizer_state_dict": optimizer.state_dict() if optimizer else None,
         "scaler_state_dict": scaler.state_dict() if scaler else None,
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
     # Ensure checkpoint directory exists

@@ -2,7 +2,8 @@
 Common training utilities including learning rate scheduling and callbacks.
 """
 
-from typing import Callable, Optional
+from typing import Optional
+
 import torch
 
 
@@ -48,9 +49,7 @@ class LearningRateScheduler:
 
 
 def get_lr_scheduler(
-    optimizer: torch.optim.Optimizer,
-    scheduler_type: str = "CosineAnnealingLR",
-    **kwargs
+    optimizer: torch.optim.Optimizer, scheduler_type: str = "CosineAnnealingLR", **kwargs
 ) -> LearningRateScheduler:
     """
     Create a learning rate scheduler.

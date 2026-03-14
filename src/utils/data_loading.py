@@ -16,7 +16,7 @@ def create_dataloader(
     pin_memory: bool = True,
     prefetch_factor: int = 2,
     persistent_workers: bool = False,
-    **kwargs
+    **kwargs,
 ) -> DataLoader:
     """
     Create an optimized DataLoader with producer-consumer pattern.
@@ -47,7 +47,7 @@ def create_dataloader(
         pin_memory=pin_memory,
         prefetch_factor=prefetch_factor,
         persistent_workers=persistent_workers,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -66,6 +66,7 @@ def get_optimal_num_workers(num_cpus: int = None) -> int:
     # Limit workers based on system RAM and CPU count
     # Generally: 0 workers on Windows/Mac, up to 8-16 on Linux with 32GB+ RAM
     import sys
+
     if sys.platform.startswith("win"):
         return 0
     elif num_cpus < 4:

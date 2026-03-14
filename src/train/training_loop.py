@@ -9,9 +9,9 @@ This module provides a production-ready training loop with:
 - Progress logging
 """
 
-import torch
 from typing import Callable, Optional
-import time
+
+import torch
 
 
 def train_epoch(
@@ -22,7 +22,7 @@ def train_epoch(
     device: str = "cuda",
     scaler: torch.cuda.amp.GradScaler = None,
     lr_scheduler: Optional[Callable] = None,
-    epoch_progress_callback: Callable[[int, float], None] = None
+    epoch_progress_callback: Callable[[int, float], None] = None,
 ) -> tuple[float, float]:
     """
     Train for one epoch.
@@ -82,7 +82,12 @@ def train_epoch(
 
 
 @torch.no_grad()
-def validate(model, dataloader, criterion: torch.nn.Module, device: str = "cuda") -> tuple[float, float]:
+def validate(
+    model,
+    dataloader,
+    criterion: torch.nn.Module,
+    device: str = "cuda",
+) -> tuple[float, float]:
     """
     Validate model on evaluation set.
 
